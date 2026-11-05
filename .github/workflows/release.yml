@@ -1,8 +1,6 @@
-name: Little Dash Adventure CI and PWA Deploy
+name: Little Dash Adventure PWA Deploy
 on:
   push:
-    branches: [main]
-  pull_request:
     branches: [main]
   workflow_dispatch:
 permissions:
@@ -25,7 +23,6 @@ jobs:
       - name: Run smoke checks
         run: node tests/smoke-check.mjs
   deploy:
-    if: github.event_name != 'pull_request'
     needs: validate
     environment:
       name: github-pages
