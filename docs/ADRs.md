@@ -1,44 +1,36 @@
 # ADRs — Little Dash Adventure
-Decisões aprovadas em 05/11/2026.
-
 ## ADR-001 — Web/PWA exclusivamente
-HTML/CSS/JavaScript no navegador, instalável como PWA. Sem Kotlin, APK, Capacitor ou wrapper nativo. Hospedagem estática via GitHub Pages.
+HTML/CSS/JavaScript no navegador e GitHub Pages. Sem Kotlin, APK, Capacitor ou wrapper nativo. Consequência: distribuição instalável via navegador e atualizações web.
 
-## ADR-002 — Motor Canvas 2D inicial
-Vertical slice em Canvas 2D com JavaScript, dados de fase separados do motor. Reavaliar Phaser ou PixiJS após benchmark e protótipo. Alternativas: Phaser (motor completo), PixiJS (renderização acelerada), Canvas (mínimas dependências).
+## ADR-002 — Canvas 2D para a primeira versão
+Canvas 2D sem dependência de engine para validar o loop. Phaser e PixiJS ficam como alternativas se benchmark justificar. Consequência: dependência pequena, mas o motor e colisões são responsabilidade do projeto.
 
 ## ADR-003 — Offline-first
-Service Worker + Cache API para shell e assets; IndexedDB para dados estruturados e foto opcional; localStorage apenas para progresso simples não sensível. Cache versionado.
+Service Worker e Cache API para shell; IndexedDB para foto/preferências; localStorage para progresso. Cache versionado e limpeza de versões antigas.
 
 ## ADR-004 — Gameplay não punitivo
-Sem Game Over, vidas ou perda de progresso. Colisões acionam recuperação assistida e invulnerabilidade breve. A dificuldade deve adaptar-se ao jogador.
+Sem Game Over, vidas ou perda de progresso. Colisões dão impulso de recuperação e o progresso só avança. A adaptação avançada será refinada por playtesting.
 
-## ADR-005 — IP e assets originais
-Personagens, cenários, fases, UI, músicas e efeitos originais ou licenciados. Proibido extrair ou reproduzir assets e músicas de Geometry Dash. Manter inventário de origem, autor, licença e atribuição.
+## ADR-005 — Propriedade intelectual
+Música, personagens, cenários e UI devem ser originais ou licenciados. Não copiar faixas, sprites, nomes, fases ou identidade visual de Geometry Dash. Manter registro de autor, origem e licença por asset.
 
 ## ADR-006 — Recompensas sem monetização
-Cosméticos conquistados jogando. Sem IAP, loot boxes pagas, anúncios ou rankings públicos.
+Estrelas e personagens desbloqueáveis por jogo. Sem compras internas, loot boxes pagas, anúncios ou ranking público.
 
 ## ADR-007 — Privacidade infantil
-Sem contas obrigatórias, rastreadores, analytics, publicidade, reconhecimento facial ou upload de dados pessoais. Responsáveis controlam e removem personalizações.
+Sem conta obrigatória, analytics, trackers, publicidade ou comunicação social. Sem reconhecimento facial. Preferências e progresso ficam no dispositivo.
 
-## ADR-008 — Surpresa opcional do Rafael
-Importação manual da foto pelo responsável; processamento local; IndexedDB local; aparição aleatória em vitórias e garantida ao concluir 12 fases se habilitada. Sem arquivo de imagem no Git, CDN, analytics ou backend. Sem reconhecimento facial. Não sincroniza entre dispositivos.
+## ADR-008 — Foto opcional do Rafael
+Importação manual pelo responsável, processamento local e armazenamento IndexedDB. Aparição em parte das vitórias e garantida ao concluir as 12 fases, se ativa. Nunca versionar, enviar ou sincronizar a imagem. Possibilidade de desativar e excluir.
 
-## ADR-009 — Progresso local
-Save local com versionamento de schema e migração defensiva. Sem sincronização na primeira versão.
+## ADR-009 — Save local
+Progresso versionado e armazenado localmente. Sincronização em nuvem fica fora do primeiro release.
 
 ## ADR-010 — Gate de qualidade
-Aprovar um nível vertical slice no Reino dos Doces antes de replicar as outras 11 fases.
+A base funcional não é considerada produto final até passar QA físico e gates de arte, áudio, acessibilidade e playtesting.
 
-## ADR-011 — Áudio original
-Trilhas originais por mundo e efeitos próprios; iniciar áudio após gesto do usuário e oferecer silêncio/volume.
+## ADR-011 — Áudio original procedural
+Web Audio API gera motivos melódicos originais sem carregar faixas de terceiros. A primeira versão é provisória; trilhas compostas finais exigem produção e licença documentadas.
 
-## Referências
-- PWA: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps
-- Service Worker: https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
-- IndexedDB: https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
-- WCAG 2.2: https://www.w3.org/TR/WCAG22/
-- Game Accessibility Guidelines: https://gameaccessibilityguidelines.com/
-- Phaser: https://docs.phaser.io/
-- PixiJS: https://pixijs.com/
+## ADR-012 — CI antes do deploy
+Pull Requests executam verificação de sintaxe e smoke tests. Deploy do Pages ocorre após validação na branch main.
