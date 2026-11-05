@@ -1,42 +1,58 @@
-# Geometry Dash
+# Geometry Dash — VSA Tecnologia
 
-A Geometry Dash clone built with vanilla JavaScript and HTML5 Canvas. No frameworks, no build step — just open `index.html`.
+Jogo de plataforma rítmico em HTML5 Canvas e JavaScript puro, executado diretamente no navegador. Este projeto é independente e não é afiliado à RobTop Games.
 
-## Play
+## Estado do projeto
+**Base jogável existente; etapa atual: estabilidade de gameplay e engenharia.** O jogo possui três fases, modos Cube/Ship, obstáculos, pads, orbs, portais de velocidade, Practice Mode, checkpoints, efeitos, áudio sintetizado e progresso local.
+
+Esta entrega corrige transições de morte, reconstrução de geometria ao redimensionar a janela e pausa ao alternar de aba. Ainda são necessários testes reais em navegadores e dispositivos.
+
+## Executar
+Não há etapa de build nem dependências externas. Na raiz do repositório:
 
 ```bash
-# Any static server works, e.g.:
 python3 -m http.server 8000
-# then open http://localhost:8000
 ```
 
-Or simply open `index.html` directly in a browser.
+Acesse http://localhost:8000.
 
-## Controls
+## Controles
+| Ação | Teclado | Mouse / toque |
+|---|---|---|
+| Pular / voar | Espaço, ↑ ou W | Clique / toque |
+| Pausar / retomar | P | Toque durante pausa |
+| Reiniciar após colisão | Espaço / Enter | Toque |
+| Silenciar | M | Botão de áudio |
+| Menu | Esc | Botão de retorno |
+| Tela cheia | F | — |
 
-- **Space / Left Click / Up Arrow** — jump / fly
-- **P** — pause
-- **R** — retry
-- **M** — mute
-- **Esc** — back to menu
+## Recursos atuais
+- Três fases: Neon Pulse, Rebound e Spectral Drift.
+- Modos Cube e Ship.
+- Espinhos, blocos, plataformas, gaps, movers, pads, orbs e portais.
+- Velocidades slow, normal, fast e very fast.
+- Practice Mode e checkpoints.
+- Progresso e tentativas salvos em localStorage.
+- Efeitos visuais e áudio sintetizado via Web Audio API.
 
-## Features
+## Estrutura
+- `index.html`: entrada.
+- `game.js`: lógica, física, fases, renderização e áudio.
+- `styles.css`: layout.
+- `actions.json`: sequência de ações para teste/playback.
+- `docs/`: arquitetura, QA e roadmap.
 
-- Cube and ship game modes
-- Jump pads, jump orbs, and portals
-- Spike and block obstacles with forgiving hitboxes
-- Multiple speed zones (slow / normal / fast / very fast)
-- Practice mode with checkpoints
-- Attempt counter, death counter, and progress tracking
-- Particle effects, screen shake, and player trail
+## Qualidade
+```bash
+node --check game.js
+```
 
-## Files
+- [Arquitetura](docs/ARCHITECTURE.md)
+- [QA](docs/QA.md)
+- [Roadmap](docs/ROADMAP.md)
 
-- `index.html` — entry point
-- `game.js` — all game logic
-- `styles.css` — canvas styling
-- `actions.json` — scripted input sequence (for automated testing/playback)
+## Persistência e privacidade
+O progresso é armazenado localmente no navegador pela chave `gd_save2`. Não há conta, backend ou telemetria implementados nesta base. Limpar os dados do navegador pode apagar o progresso.
 
-## License
-
-MIT — see [LICENSE](LICENSE).
+## Licença e propriedade intelectual
+O arquivo LICENSE existente declara MIT e atribui copyright a Anay Goenka. Preserve esse aviso e os termos da licença ao redistribuir. Geometry Dash e suas marcas/ativos oficiais pertencem aos respectivos titulares. Use somente identidade visual, músicas, sprites e fases originais ou devidamente licenciados; não utilize assets extraídos do jogo comercial.
