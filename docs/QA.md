@@ -1,18 +1,21 @@
 # QA — Little Dash Adventure
-## Smoke tests obrigatórios
-- Abrir home em desktop e celular.
-- Navegar para os quatro mundos e as 12 fases.
-- Iniciar fase, saltar por toque/clique e teclado.
-- Pausar, retomar e sair sem travar o loop.
-- Verificar coleta de estrelas e persistência após recarregar.
-- Concluir fase e verificar comemoração; validar navegação para fase seguinte.
-- Importar foto na área dos responsáveis, confirmar preview, desativar, remover e recarregar.
-- Confirmar que foto não aparece em requisições de rede nem em arquivos versionados.
-- Após primeira carga, ativar modo avião e recarregar shell PWA.
-- Testar Android Chrome, iOS Safari e desktop.
+## Testes automatizados no CI
+- `node --check app.js`
+- `node tests/smoke-check.mjs`: verifica referências DOM, quatro mundos/12 fases, fluxo de vitória, persistência local da foto, ausência de chamadas de rede no app, cache versionado e movimento reduzido.
 
-## Limitações conhecidas da primeira base
-- Arte e animações ainda são protótipo Canvas; não é a direção artística final.
-- Música original, efeitos completos, recompensas cosméticas e dificuldade adaptativa refinada pendentes.
-- A colisão atualmente aplica impulso de recuperação simples; precisa de testes de acessibilidade e ajuste.
-- Ícones de instalação e auditoria Lighthouse ainda pendentes.
+## Checklist manual antes de release
+- [ ] Android Chrome: instalação PWA, toque, áudio, rotação, pausa e retorno.
+- [ ] iOS Safari: adicionar à tela inicial, toque, áudio e persistência.
+- [ ] Desktop Chrome/Firefox/Safari: clique e teclado.
+- [ ] Completar as 12 fases; verificar desbloqueios e estrelas após recarregar.
+- [ ] Testar colisões e recuperação com diferentes tempos de salto.
+- [ ] Verificar música, mute, pause e retomada.
+- [ ] Importar foto, confirmar aparição aleatória e final, desativar e remover.
+- [ ] Confirmar em DevTools que a imagem não é enviada por requisição.
+- [ ] Primeira carga online e segunda carga em modo avião.
+- [ ] Lighthouse: performance, acessibilidade, boas práticas e PWA.
+- [ ] Validar redução de movimento e alvos de toque.
+- [ ] Conferir que nenhum asset pessoal/licença duvidosa entrou no repositório.
+
+## Limitações conhecidas
+A arte atual é vetorial/Canvas com formas e emojis, não uma produção final de sprites ilustrados. Áudio é procedural simples, não trilha composta final. A dificuldade ainda usa parâmetros por fase e recuperação básica; não há sistema sofisticado de adaptação comportamental. Os testes automatizados atuais são smoke tests estáticos, não substituem QA de gameplay em aparelhos reais.
