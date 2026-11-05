@@ -64,7 +64,26 @@ function draw(){if(!ctx)return;const g=ctx,w=worlds[state.world],floor=H-75;g.cl
  for(let i=0;i<6;i++){let x=((i*230-state.cam*.7)%(W+220)+W+220)%(W+220)-100;g.font='30px system-ui';g.globalAlpha=.72;g.fillText(w.objects[i%3],x,floor-7);g.globalAlpha=1}
  for(const p of state.particles){g.globalAlpha=Math.max(0,p.life);g.fillStyle=p.color;g.beginPath();g.arc(p.x-state.cam,p.y,4,0,7);g.fill()}g.globalAlpha=1;
  // player character
- const px=state.x-state.cam+22,py=state.y+23,c=chars[state.character];g.save();g.translate(px,py);g.rotate(Math.min(.18,Math.max(-.18,state.vy/3000)));g.fillStyle=c.color;roundRect(g,-22,-22,44,44,14);g.fill();g.strokeStyle='#fff';g.lineWidth=4;g.stroke();g.fillStyle='#423552';g.beginPath();g.arc(-8,-3,3,0,7);g.arc(9,-3,3,0,7);g.fill();g.strokeStyle='#8d4656';g.lineWidth=2.5;g.beginPath();g.arc(0,4,7,.15,Math.PI-.15);g.stroke();if(state.character==='foguetinho'){g.fillStyle='#ff8c63';g.beginPath();g.moveTo(-10,22);g.lineTo(0,34+Math.random()*6);g.lineTo(10,22);g.fill()}g.restore();
+ const px=state.x-state.cam+22,py=state.y+23,c=chars[state.character];g.save();g.translate(px,py);g.rotate(Math.min(.18,Math.max(-.18,state.vy/3000)));g.lineJoin='round';g.strokeStyle='#fff';g.lineWidth=3.5;g.fillStyle=c.color;
+ if(state.character==='dino'){
+  g.beginPath();g.ellipse(-1,5,22,17,0,0,Math.PI*2);g.fill();g.stroke();
+  g.beginPath();g.moveTo(-18,10);g.lineTo(-31,17);g.lineTo(-17,20);g.closePath();g.fill();g.stroke();
+  g.beginPath();g.arc(12,-10,14,0,Math.PI*2);g.fill();g.stroke();
+  g.fillStyle='#4e956f';for(let k=0;k<3;k++){g.beginPath();g.moveTo(-11+k*11,-9);g.lineTo(-6+k*11,-21);g.lineTo(1+k*11,-9);g.fill()}
+  g.fillStyle='#423552';g.beginPath();g.arc(16,-13,2.8,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(18,-14,1,0,7);g.fill();
+  g.strokeStyle='#356c55';g.lineWidth=2;g.beginPath();g.arc(17,-3,5,.2,2.7);g.stroke();
+ }else if(state.character==='estrelinha'){
+  g.beginPath();for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,r=k%2?12:26;g.lineTo(Math.cos(a)*r,Math.sin(a)*r)}g.closePath();g.fill();g.stroke();
+  g.fillStyle='#49395d';g.beginPath();g.arc(-8,-2,2.8,0,7);g.arc(8,-2,2.8,0,7);g.fill();g.strokeStyle='#9a5361';g.lineWidth=2;g.beginPath();g.arc(0,4,7,.15,Math.PI-.15);g.stroke();
+ }else if(state.character==='foguetinho'){
+  g.fillStyle='#ff956d';g.beginPath();g.moveTo(-12,13);g.lineTo(-20,26);g.lineTo(-5,22);g.closePath();g.fill();g.stroke();g.beginPath();g.moveTo(12,13);g.lineTo(20,26);g.lineTo(5,22);g.closePath();g.fill();g.stroke();
+  g.fillStyle='#f4f2ff';g.beginPath();g.moveTo(0,-30);g.quadraticCurveTo(24,-8,17,17);g.quadraticCurveTo(0,31,-17,17);g.quadraticCurveTo(-24,-8,0,-30);g.fill();g.stroke();
+  g.fillStyle='#9e9af2';g.beginPath();g.arc(0,-2,9,0,7);g.fill();g.stroke();g.fillStyle='#423552';g.beginPath();g.arc(-3,-3,2,0,7);g.arc(4,-3,2,0,7);g.fill();
+  g.fillStyle='#ffb45f';g.beginPath();g.moveTo(-8,22);g.lineTo(0,36+Math.random()*6);g.lineTo(8,22);g.closePath();g.fill();
+ }else{
+  roundRect(g,-22,-22,44,44,14);g.fill();g.stroke();g.fillStyle='#423552';g.beginPath();g.arc(-8,-3,3,0,7);g.arc(9,-3,3,0,7);g.fill();g.strokeStyle='#8d4656';g.lineWidth=2.5;g.beginPath();g.arc(0,4,7,.15,Math.PI-.15);g.stroke();
+ }
+ g.restore();
  g.fillStyle='#fff';g.font='bold 15px system-ui';g.fillText('⭐ '+state.coins,15,25);g.fillStyle='#ffffff88';roundRect(g,15,38,W-30,7,4);g.fill();g.fillStyle='#fff';roundRect(g,15,38,(W-30)*Math.min(1,state.x/stages[state.world][state.level].length),7,4);g.fill();
 }
 function winLevel(){if(state.won)return;state.won=true;state.running=false;cancelAnimationFrame(raf);stopMusic();const id=state.world*3+state.level;state.done[id]=true;state.stars+=Math.max(1,state.coins);state.unlocked=Math.max(state.unlocked,Math.min(11,id+1));saveProgress();const final=id===11;$('win-title').textContent=final?'VOCÊ CONQUISTOU A AVENTURA!':'Você conseguiu!';$('win-copy').textContent=final?'As 12 fases concluídas! Você é incrível!':'Você encontrou '+Math.max(1,state.coins)+' estrelinhas. Que aventura!';const surprise=state.face&&state.faceEnabled&&(final||Math.random()<.22);$('rafael-surprise').classList.toggle('hidden',!surprise);if(surprise)$('rafael-image').src=state.face;$('next').textContent=final?'Jogar novamente ↻':state.level===2?'Próximo mundo ➜':'Próxima fase ➜';$('next').classList.toggle('hidden',false);$('replay').classList.remove('hidden');if(final)$('next').textContent='Recomeçar aventura ↻';$('win-panel').classList.remove('hidden');celebrate()}
