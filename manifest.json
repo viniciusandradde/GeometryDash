@@ -1,0 +1,24 @@
+{
+  "name": "Little Dash Adventure",
+  "short_name": "Little Dash",
+  "description": "Uma aventura colorida e acolhedora para crianças.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fbfaff",
+  "theme_color": "#7055e8",
+  "categories": [
+    "games",
+    "education"
+  ],
+  "icons": [
+    {
+      "src": "./assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

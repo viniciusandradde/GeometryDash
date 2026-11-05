@@ -1,109 +1,66 @@
-# Geometry Dash — VSA Tecnologia
+# Little Dash Adventure 🌈
+**Jogo infantil original | Web/PWA | pt-BR**
 
-Jogo de plataforma rítmico em HTML5 Canvas e JavaScript puro, executado diretamente no navegador. Este projeto é independente e não é afiliado à RobTop Games.
+Little Dash Adventure é uma experiência de plataforma acolhedora para crianças: o personagem avança automaticamente, a criança toca para saltar, coleta estrelas e explora quatro mundos. Não existe Game Over, perda de vidas, anúncios ou compras internas.
 
-## Estado do projeto
-**Base jogável existente; etapa atual: estabilidade de gameplay e engenharia.** O jogo possui três fases, modos Cube/Ship, obstáculos, pads, orbs, portais de velocidade, Practice Mode, checkpoints, efeitos, áudio sintetizado e progresso local.
+## Acessos
+- **Jogar (GitHub Pages):** https://viniciusandradde.github.io/GeometryDash/
+- **Repositório:** https://github.com/viniciusandradde/GeometryDash
+- **Pull Request de desenvolvimento:** https://github.com/viniciusandradde/GeometryDash/pull/2
+- **Releases:** https://github.com/viniciusandradde/GeometryDash/releases
+- **Actions/CI:** https://github.com/viniciusandradde/GeometryDash/actions
 
-Esta entrega corrige transições de morte, reconstrução de geometria ao redimensionar a janela e pausa ao alternar de aba. Ainda são necessários testes reais em navegadores e dispositivos.
+A URL de Pages só refletirá esta versão depois que as alterações forem integradas à main e o workflow de publicação terminar com sucesso.
 
-## Executar
-Não há etapa de build nem dependências externas para executar a versão web. Na raiz do repositório:
+## Conteúdo — 4 mundos / 12 fases
+| Mundo | Fases |
+|---|---|
+| 🍭 Reino dos Doces | Bosque de Balas · Ponte de Biscoito · Castelo de Chocolate |
+| 🦕 Ilha dos Dinossauros | Vale das Pegadas · Vulcão Dorminhoco · Festa dos Dinossauros |
+| 🐠 Fundo do Mar | Jardim de Corais · Caverna das Pérolas · Baile das Sereias |
+| 🚀 Aventura Espacial | Lua de Queijo · Anéis de Saturno · Grande Cometa |
 
-```bash
-python3 -m http.server 8000
-```
+## Como jogar
+- Toque/clique na tela ou use Espaço / Seta para cima para saltar.
+- O botão II pausa; música pode ser silenciada.
+- Obstáculos geram recuperação assistida; não há tela de derrota.
+- Ganhe estrelas para desbloquear personagens na coleção.
+- Fases são liberadas progressivamente.
 
-Acesse http://localhost:8000.
+## Personalização familiar opcional
+Na Área dos Responsáveis, a família pode importar uma foto do Rafael. O navegador cria um recorte circular e grava no IndexedDB local. A imagem aparece aleatoriamente em algumas vitórias e sempre ao concluir as 12 fases, se a opção estiver ativa. Pode ser desativada ou removida a qualquer momento.
+**A foto não é incluída no repositório, não é enviada por rede, não é processada por reconhecimento facial e não é usada em analytics.** Para adicionar, importar a foto neste dispositivo depois de abrir o jogo.
 
-## Aplicativo Android: arquitetura e tecnologia
+## Arquitetura e execução
+- `index.html`: telas e acessibilidade.
+- `styles.css`: interface responsiva e preferência de movimento reduzido.
+- `app.js`: motor Canvas 2D, física simples, conteúdo, progressão, áudio sintetizado e persistência.
+- `manifest.json`, `sw.js`: instalação PWA e cache offline.
+- `assets/icon.svg`: ícone original.
+- `docs/`: PRD, ADRs, arquitetura, QA e roadmap.
+- `tests/smoke-check.mjs`: validações estáticas.
 
-O projeto também possui empacotamento para Android por meio do **Capacitor 7**.
+Para executar localmente: `python3 -m http.server 8000` e acesse `http://localhost:8000`. Não abra o HTML via `file://`, pois Service Worker e IndexedDB dependem de contexto HTTP seguro/local.
 
-**Importante: o jogo não foi desenvolvido integralmente em Kotlin.** A lógica principal, a física, as fases, a renderização e o áudio continuam implementados em JavaScript, HTML5 Canvas e CSS. No Android, essa aplicação web é executada dentro de uma WebView, empacotada como aplicativo Android pelo Capacitor.
+## Desenvolvimento e release
+1. Alterações em branch.
+2. CI verifica sintaxe e smoke tests em Pull Requests.
+3. Merge na main aciona GitHub Pages.
+4. Criar tag/release SemVer (`vMAJOR.MINOR.PATCH`) após smoke tests manuais em Android Chrome, iOS Safari e desktop.
+5. Validar instalação, offline, som, progresso e exclusão de foto antes de anunciar a versão.
 
-| Camada | Tecnologia | Responsabilidade |
-|---|---|---|
-| Jogo e gameplay | JavaScript | Física, controles, colisões, fases, progresso e áudio |
-| Interface e renderização | HTML5 Canvas e CSS | Tela do jogo, menus e apresentação visual |
-| Integração Android | Capacitor 7 | Empacotamento da aplicação web e acesso às capacidades nativas quando necessário |
-| Projeto nativo Android | Android / Gradle | Estrutura de compilação e geração do APK |
+## Escopo e limitações desta entrega
+A base implementa a navegação, 12 fases parametrizadas, gameplay Canvas, progressão, personagens desbloqueáveis, efeitos visuais básicos, áudio procedural original, save local, PWA e controles parentais da foto. Ainda requer rodada de QA em dispositivos físicos e refinamento de arte, animações, desenho de fases, trilhas compostas e acessibilidade antes de ser tratada como versão final de produção.
 
-Configuração atual:
-- **Application ID:** `com.vsa.technology.geometrydash`
-- **Nome Android:** `Geometry Dash VSA`
-- **Diretório web empacotado:** `www/`
-- **APK gerado no CI:** variante debug (`app-debug.apk`).
-
-O projeto Android é preparado durante o workflow de CI; portanto, a implementação atual não representa uma reescrita nativa do motor do jogo em Kotlin. Caso sejam adicionadas funcionalidades nativas específicas, elas poderão utilizar Kotlin no projeto Android.
-
-### Gerar o APK localmente
-
-Requisitos: Node.js 20 ou compatível, JDK 21, Android SDK e ferramentas do Gradle.
-
-```bash
-npm install
-mkdir -p www
-cp index.html game.js styles.css www/
-npx cap add android
-npx cap sync android
-cd android
-./gradlew assembleDebug
-```
-
-O APK de debug será gerado em:
-
-```
-android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-Para atualizar os arquivos web depois de alterações no jogo:
-
-```bash
-mkdir -p www
-cp index.html game.js styles.css www/
-npx cap sync android
-```
-
-## Controles
-| Ação | Teclado | Mouse / toque |
-|---|---|---|
-| Pular / voar | Espaço, ↑ ou W | Clique / toque |
-| Pausar / retomar | P | Toque durante pausa |
-| Reiniciar após colisão | Espaço / Enter | Toque |
-| Silenciar | M | Botão de áudio |
-| Menu | Esc | Botão de retorno |
-| Tela cheia | F | — |
-
-## Recursos atuais
-- Três fases: Neon Pulse, Rebound e Spectral Drift.
-- Modos Cube e Ship.
-- Espinhos, blocos, plataformas, gaps, movers, pads, orbs e portais.
-- Velocidades slow, normal, fast e very fast.
-- Practice Mode e checkpoints.
-- Progresso e tentativas salvos em localStorage.
-- Efeitos visuais e áudio sintetizado via Web Audio API.
-
-## Estrutura
-- `index.html`: entrada.
-- `game.js`: lógica, física, fases, renderização e áudio.
-- `styles.css`: layout.
-- `actions.json`: sequência de ações para teste/playback.
-- `docs/`: arquitetura, QA e roadmap.
-- `package.json` e `capacitor.config.json`: dependências e configuração do empacotamento Android.
-- `.github/workflows/`: automação de validação, publicação web e geração do APK.
-
-## Qualidade
-```bash
-node --check game.js
-```
-
-- [Arquitetura](docs/ARCHITECTURE.md)
-- [QA](docs/QA.md)
-- [Roadmap](docs/ROADMAP.md)
-
-## Persistência e privacidade
-O progresso é armazenado localmente no navegador pela chave `gd_save2`. Não há conta, backend ou telemetria implementados nesta base. Limpar os dados do navegador pode apagar o progresso.
-
-## Licença e propriedade intelectual
-O arquivo LICENSE existente declara MIT e atribui copyright a Anay Goenka. Preserve esse aviso e os termos da licença ao redistribuir. Geometry Dash e suas marcas/ativos oficiais pertencem aos respectivos titulares. Use somente identidade visual, músicas, sprites e fases originais ou devidamente licenciados; não utilize assets extraídos do jogo comercial.
+## Referências técnicas
+- PWA: https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps
+- Service Worker: https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API
+- Cache API: https://developer.mozilla.org/en-US/docs/Web/API/Cache
+- IndexedDB: https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API
+- Web Audio API: https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API
+- WCAG 2.2: https://www.w3.org/TR/WCAG22/
+- Game Accessibility Guidelines: https://gameaccessibilityguidelines.com/
+- Phaser: https://docs.phaser.io/
+- PixiJS: https://pixijs.com/
+- Kenney (confirmar licença de cada pacote): https://kenney.nl/assets
+- OpenGameArt (confirmar licença por recurso): https://opengameart.org/

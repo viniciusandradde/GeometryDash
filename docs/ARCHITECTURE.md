@@ -1,5 +1,26 @@
-# Arquitetura — Geometry Dash
+# Arquitetura — Little Dash Adventure
+## Decisão
+Aplicação 100% Web/PWA, hospedada como site estático. Não utiliza Kotlin, APK, Capacitor ou wrapper nativo.
 
-Aplicação HTML5 Canvas com JavaScript vanilla. O código principal está em `game.js`; `index.html` é a entrada e `styles.css` controla o canvas. O estado inclui menu, playing, paused, dead e complete; as fases são listas de obstáculos em coordenadas de mundo. O progresso é salvo localmente em `localStorage` na chave `gd_save2`. A simulação e renderização ainda compartilham o mesmo loop e a física está ligada ao frame rate; a separação e timestep fixo são prioridades futuras.
+## Componentes
+- Interface sem framework: HTML semântico e CSS responsivo.
+- Motor: Canvas 2D e requestAnimationFrame; física leve executada no cliente.
+- Conteúdo: configuração declarativa dos mundos, fases, paletas e temas musicais.
+- Persistência: localStorage para progresso e IndexedDB para preferências e foto familiar.
+- Offline: Service Worker + Cache API, cache versionado e same-origin.
+- Áudio: Web Audio API com motivos melódicos procedurais originais, ativados após interação do usuário.
 
-A etapa atual corrige o timeout de morte, reconstrução da geometria no resize, pausa ao ocultar a aba e retomada do áudio. Preserve `render_game_to_text` e `advanceTime` usados no teste automatizado.
+## Dados locais
+O progresso guarda versão do schema, estrelas, fases concluídas/desbloqueadas e personagem selecionado. A foto opcional é importada manualmente pelo responsável, recortada no navegador e armazenada como imagem local no IndexedDB. Não há upload, sincronização, telemetria ou reconhecimento facial.
+
+## Loop do jogo
+Avanço automático; toque para saltar; coleta de estrelas; obstáculos com recuperação assistida; efeitos de partículas; vitória e recompensa. O jogo não pune erros com perda de vida ou reinício obrigatório.
+
+## Performance
+Canvas dimensionado com pixel ratio máximo 2; requestAnimationFrame; cache estático; animação reduzida respeitando prefers-reduced-motion no CSS. O próximo ciclo deve implementar timestep fixo e profiling em aparelhos de entrada.
+
+## Distribuição
+GitHub Pages. CI valida JavaScript e smoke tests em PR; deploy só após validação na branch principal.
+
+## Evolução
+Avaliar Phaser ou PixiJS somente se benchmark demonstrar benefício claro. Separar cada fase em dados próprios, adicionar testes automatizados de colisão e acessibilidade, e profissionalizar pipeline de arte/áudio.
