@@ -173,8 +173,14 @@ window.addEventListener("keydown", (e) => {
     }
   }
   if (c === "KeyP") {
-    if (gameState === "playing") gameState = "paused";
-    else if (gameState === "paused") gameState = "playing";
+    if (gameState === "playing") {
+      gameState = "paused";
+      inputHeld = false;
+      stopMusic();
+    } else if (gameState === "paused") {
+      gameState = "playing";
+      startMusic();
+    }
   }
   if (c === "KeyM") muted = !muted;
 
@@ -229,6 +235,7 @@ function tapHandler(x, y) {
       return;
     }
     gameState = "playing";
+    startMusic();
     return;
   }
   // Check mute button (top-right)
