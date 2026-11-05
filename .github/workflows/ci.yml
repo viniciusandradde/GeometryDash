@@ -1,21 +1,20 @@
-name: Validate Geometry Dash
-
+name: Validate Little Dash Adventure
 on:
   push:
     branches: [main, "feat/**"]
   pull_request:
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
-  syntax:
+  syntax-and-smoke:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-      - name: Validate JavaScript syntax
-        run: node --check game.js
+          node-version: 22
+      - name: Validate game JavaScript
+        run: node --check app.js
+      - name: Run project smoke tests
+        run: node tests/smoke-check.mjs
