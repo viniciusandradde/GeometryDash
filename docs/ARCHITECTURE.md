@@ -1,21 +1,26 @@
 # Arquitetura — Little Dash Adventure
-A aplicação é uma PWA estática com HTML/CSS/JavaScript. index.html apresenta a interface, styles.css o layout responsivo, app.js navegação e gameplay Canvas 2D, manifest.json metadados de instalação e sw.js cache offline.
+## Decisão
+Aplicação 100% Web/PWA, hospedada como site estático. Não utiliza Kotlin, APK, Capacitor ou wrapper nativo.
 
-## Camadas
-- Interface: telas home, mundos, fases, jogo e área dos responsáveis.
-- Gameplay: loop requestAnimationFrame, simulação Canvas, salto por toque/teclado, coleta, obstáculos e recuperação assistida.
-- Conteúdo: quatro mundos e três fases por mundo.
-- Persistência: localStorage para progresso/estrelas; IndexedDB para a foto opcional importada pelo responsável.
-- Offline: Service Worker com cache versionado do shell.
+## Componentes
+- Interface sem framework: HTML semântico e CSS responsivo.
+- Motor: Canvas 2D e requestAnimationFrame; física leve executada no cliente.
+- Conteúdo: configuração declarativa dos mundos, fases, paletas e temas musicais.
+- Persistência: localStorage para progresso e IndexedDB para preferências e foto familiar.
+- Offline: Service Worker + Cache API, cache versionado e same-origin.
+- Áudio: Web Audio API com motivos melódicos procedurais originais, ativados após interação do usuário.
 
-## Privacidade
-A foto do Rafael é escolhida manualmente pelo responsável, processada localmente e salva no IndexedDB. Não incluir imagem no Git, assets públicos, telemetria ou backend. A primeira versão não possui conta ou sincronização.
+## Dados locais
+O progresso guarda versão do schema, estrelas, fases concluídas/desbloqueadas e personagem selecionado. A foto opcional é importada manualmente pelo responsável, recortada no navegador e armazenada como imagem local no IndexedDB. Não há upload, sincronização, telemetria ou reconhecimento facial.
+
+## Loop do jogo
+Avanço automático; toque para saltar; coleta de estrelas; obstáculos com recuperação assistida; efeitos de partículas; vitória e recompensa. O jogo não pune erros com perda de vida ou reinício obrigatório.
+
+## Performance
+Canvas dimensionado com pixel ratio máximo 2; requestAnimationFrame; cache estático; animação reduzida respeitando prefers-reduced-motion no CSS. O próximo ciclo deve implementar timestep fixo e profiling em aparelhos de entrada.
 
 ## Distribuição
-GitHub Pages. O workflow valida sintaxe JavaScript e publica os arquivos estáticos da raiz. Sem Capacitor, Kotlin ou APK.
+GitHub Pages. CI valida JavaScript e smoke tests em PR; deploy só após validação na branch principal.
 
-## Próximas decisões técnicas
-- Separar dados de fase do motor e usar timestep fixo.
-- Avaliar Phaser/PixiJS após medir a vertical slice.
-- Criar pipeline de assets licenciados, áudio original e inventário cosmético.
-- Adicionar migração de schema para progresso e testes automatizados de gameplay.
+## Evolução
+Avaliar Phaser ou PixiJS somente se benchmark demonstrar benefício claro. Separar cada fase em dados próprios, adicionar testes automatizados de colisão e acessibilidade, e profissionalizar pipeline de arte/áudio.
