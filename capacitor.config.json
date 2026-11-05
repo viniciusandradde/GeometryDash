@@ -1,0 +1,6 @@
+{
+  "appId": "com.vsa.technology.geometrydash",
+  "appName": "Geometry Dash VSA",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
