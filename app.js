@@ -53,39 +53,54 @@ function loop(t){if(!state.running||state.paused)return;const dt=Math.min((t-las
 function update(dt){const cfg=stages[state.world][state.level];state.x+=state.speed*dt;state.cam=Math.max(0,state.x-190);state.vy+=1550*dt;state.y+=state.vy*dt;const floor=H-122;if(state.y>floor){state.y=floor;state.vy=0}for(const h of state.obstacles){if(h.hit)continue;if(state.x+27>h.x&&state.x-23<h.x+h.w&&state.y+43>H-75-h.h){h.hit=true;state.assists++;state.speed=Math.max(190,state.speed-12);state.vy=-390;state.y-=12;emit(state.x,state.y,'#fff',10);if(state.assists>=3){h.hit=true;state.x+=45;state.assists=0}}}for(const c of state.items)if(!c.taken&&Math.abs(state.x-c.x)<34&&Math.abs(state.y-c.y)<62){c.taken=true;state.coins++;emit(c.x,c.y,'#ffdc66',7)}state.particles=state.particles.filter(p=>p.life>0);for(const p of state.particles){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=350*dt;p.life-=dt}state.time+=dt;if(state.x>cfg.length)winLevel()}
 function emit(x,y,color,n){for(let i=0;i<n;i++)state.particles.push({x,y,vx:(Math.random()-.5)*190,vy:-Math.random()*180-20,life:.45+Math.random()*.4,color})}
 function roundRect(g,x,y,w,h,r){g.beginPath();g.roundRect(x,y,w,h,r)}
-function draw(){if(!ctx)return;const g=ctx,w=worlds[state.world],floor=H-75;g.clearRect(0,0,W,H);const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,w.sky[0]);sky.addColorStop(1,w.sky[1]);g.fillStyle=sky;g.fillRect(0,0,W,H);
- // Decorative parallax clouds and hills
- for(let i=0;i<7;i++){const x=((i*175-state.cam*.18)%(W+150)+W+150)%(W+150)-70,y=42+(i%3)*38;g.fillStyle='#ffffffaa';g.beginPath();g.arc(x,y,22,0,Math.PI*2);g.arc(x+24,y-8,27,0,Math.PI*2);g.arc(x+50,y,20,0,Math.PI*2);g.fill()}
- g.fillStyle=w.ground;g.beginPath();g.moveTo(0,floor);for(let x=0;x<=W;x+=35)g.lineTo(x,floor+Math.sin((x+state.cam*.25)*.012)*7);g.lineTo(W,H);g.lineTo(0,H);g.closePath();g.fill();
- g.fillStyle='#ffffff55';for(let x=-(state.cam%44);x<W;x+=44)roundRect(g,x,floor+12,22,5,3),g.fill();
- for(const c of state.items)if(!c.taken){const x=c.x-state.cam;if(x>-20&&x<W+20){g.save();g.translate(x,c.y);g.rotate(Math.sin(state.time*4+c.x)*.15);g.fillStyle='#ffcf4e';g.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,r=i%2?7:14;g.lineTo(Math.cos(a)*r,Math.sin(a)*r)}g.closePath();g.fill();g.restore()}}
- for(const h of state.obstacles){const x=h.x-state.cam;if(x>-50&&x<W+50){g.fillStyle=state.world===1?'#4f9d6b':state.world===2?'#6b9cae':state.world===3?'#7770b9':'#c76d91';g.beginPath();g.moveTo(x-5,floor);g.lineTo(x+h.w*.5,floor-h.h);g.lineTo(x+h.w+5,floor);g.closePath();g.fill();g.fillStyle='#ffffff99';g.beginPath();g.arc(x+h.w*.5,floor-h.h+8,4,0,7);g.fill()}}
- // world props near foreground
- for(let i=0;i<6;i++){let x=((i*230-state.cam*.7)%(W+220)+W+220)%(W+220)-100;g.font='30px system-ui';g.globalAlpha=.72;g.fillText(w.objects[i%3],x,floor-7);g.globalAlpha=1}
+function draw(){if(!ctx)return;const g=ctx,w=worlds[state.world],floor=H-75,progress=Math.min(1,state.x/stages[state.world][state.level].length);g.clearRect(0,0,W,H);
+ const sky=g.createLinearGradient(0,0,0,H);sky.addColorStop(0,w.sky[0]);sky.addColorStop(1,w.sky[1]);g.fillStyle=sky;g.fillRect(0,0,W,H);
+ drawWorldBackdrop(g,floor);
+ // Soft distant clouds with layered parallax
+ for(let i=0;i<7;i++){const x=((i*175-state.cam*.16)%(W+160)+W+160)%(W+160)-80,y=42+(i%3)*38;g.globalAlpha=.72;g.fillStyle='#fff';g.beginPath();g.arc(x,y,20,0,Math.PI*2);g.arc(x+23,y-9,26,0,Math.PI*2);g.arc(x+48,y,19,0,Math.PI*2);g.fill()}g.globalAlpha=1;
+ // Floating world decorations
+ for(let i=0;i<8;i++){const x=((i*147-state.cam*.34)%(W+100)+W+100)%(W+100)-40,y=105+(i%4)*42+Math.sin(state.time*1.3+i)*5;g.save();g.translate(x,y);g.rotate(Math.sin(state.time+i)*.12);g.globalAlpha=.55;g.font='24px system-ui';g.fillText(w.objects[i%3],-12,8);g.restore()}g.globalAlpha=1;
+ // Ground with a layered rim and moving texture
+ g.fillStyle=w.ground;g.beginPath();g.moveTo(0,floor);for(let x=0;x<=W;x+=28)g.lineTo(x,floor+Math.sin((x+state.cam*.25)*.012)*6);g.lineTo(W,H);g.lineTo(0,H);g.closePath();g.fill();
+ g.fillStyle='#ffffff65';g.fillRect(0,floor+2,W,5);g.fillStyle='#0000000b';g.fillRect(0,floor+18,W,H-floor-18);
+ for(let x=-(state.cam%48);x<W;x+=48){g.fillStyle='#ffffff55';roundRect(g,x,floor+15,25,5,3);g.fill();g.fillStyle='#00000012';roundRect(g,x+23,floor+29,13,4,2);g.fill()}
+ // Collectibles with halo and twinkle
+ for(const c of state.items)if(!c.taken){const x=c.x-state.cam;if(x>-24&&x<W+24){g.save();g.translate(x,c.y);g.rotate(Math.sin(state.time*3+c.x)*.18);const pulse=1+Math.sin(state.time*5+c.x)*.08;g.scale(pulse,pulse);g.shadowColor='#ffcf4e';g.shadowBlur=13;g.fillStyle='#fff4b5';g.beginPath();g.arc(0,0,17,0,Math.PI*2);g.fill();g.shadowBlur=0;g.fillStyle='#ffca45';g.beginPath();for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,r=k%2?7:14;g.lineTo(Math.cos(a)*r,Math.sin(a)*r)}g.closePath();g.fill();g.strokeStyle='#fff';g.lineWidth=2;g.stroke();g.restore()}}
+ // Obstacles become friendly, rounded world props rather than sharp spikes
+ for(const h of state.obstacles){const x=h.x-state.cam;if(x>-55&&x<W+55)drawFriendlyObstacle(g,x,floor,h,state.world)}
+ // Finish gate visible near the end
+ const finish=stages[state.world][state.level].length-state.cam+state.x-state.x;
+ if(finish<W+100&&finish>-30){g.save();g.translate(finish,floor);g.fillStyle='#fff9';roundRect(g,-8,-105,16,105,8);g.fill();g.fillStyle=w.accent;roundRect(g,-36,-115,72,20,10);g.fill();g.font='bold 13px system-ui';g.textAlign='center';g.fillStyle='#fff';g.fillText('CHEGADA',0,-101);g.restore()}
+ // Sparkles and dust
  for(const p of state.particles){g.globalAlpha=Math.max(0,p.life);g.fillStyle=p.color;g.beginPath();g.arc(p.x-state.cam,p.y,4,0,7);g.fill()}g.globalAlpha=1;
- // player character
- const px=state.x-state.cam+22,py=state.y+23,c=chars[state.character];g.save();g.translate(px,py);g.rotate(Math.min(.18,Math.max(-.18,state.vy/3000)));g.lineJoin='round';g.strokeStyle='#fff';g.lineWidth=3.5;g.fillStyle=c.color;
- if(state.character==='dino'){
-  g.beginPath();g.ellipse(-1,5,22,17,0,0,Math.PI*2);g.fill();g.stroke();
-  g.beginPath();g.moveTo(-18,10);g.lineTo(-31,17);g.lineTo(-17,20);g.closePath();g.fill();g.stroke();
-  g.beginPath();g.arc(12,-10,14,0,Math.PI*2);g.fill();g.stroke();
-  g.fillStyle='#4e956f';for(let k=0;k<3;k++){g.beginPath();g.moveTo(-11+k*11,-9);g.lineTo(-6+k*11,-21);g.lineTo(1+k*11,-9);g.fill()}
-  g.fillStyle='#423552';g.beginPath();g.arc(16,-13,2.8,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(18,-14,1,0,7);g.fill();
-  g.strokeStyle='#356c55';g.lineWidth=2;g.beginPath();g.arc(17,-3,5,.2,2.7);g.stroke();
- }else if(state.character==='estrelinha'){
-  g.beginPath();for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,r=k%2?12:26;g.lineTo(Math.cos(a)*r,Math.sin(a)*r)}g.closePath();g.fill();g.stroke();
-  g.fillStyle='#49395d';g.beginPath();g.arc(-8,-2,2.8,0,7);g.arc(8,-2,2.8,0,7);g.fill();g.strokeStyle='#9a5361';g.lineWidth=2;g.beginPath();g.arc(0,4,7,.15,Math.PI-.15);g.stroke();
- }else if(state.character==='foguetinho'){
-  g.fillStyle='#ff956d';g.beginPath();g.moveTo(-12,13);g.lineTo(-20,26);g.lineTo(-5,22);g.closePath();g.fill();g.stroke();g.beginPath();g.moveTo(12,13);g.lineTo(20,26);g.lineTo(5,22);g.closePath();g.fill();g.stroke();
-  g.fillStyle='#f4f2ff';g.beginPath();g.moveTo(0,-30);g.quadraticCurveTo(24,-8,17,17);g.quadraticCurveTo(0,31,-17,17);g.quadraticCurveTo(-24,-8,0,-30);g.fill();g.stroke();
-  g.fillStyle='#9e9af2';g.beginPath();g.arc(0,-2,9,0,7);g.fill();g.stroke();g.fillStyle='#423552';g.beginPath();g.arc(-3,-3,2,0,7);g.arc(4,-3,2,0,7);g.fill();
-  g.fillStyle='#ffb45f';g.beginPath();g.moveTo(-8,22);g.lineTo(0,36+Math.random()*6);g.lineTo(8,22);g.closePath();g.fill();
- }else{
-  roundRect(g,-22,-22,44,44,14);g.fill();g.stroke();g.fillStyle='#423552';g.beginPath();g.arc(-8,-3,3,0,7);g.arc(9,-3,3,0,7);g.fill();g.strokeStyle='#8d4656';g.lineWidth=2.5;g.beginPath();g.arc(0,4,7,.15,Math.PI-.15);g.stroke();
- }
- g.restore();
- g.fillStyle='#fff';g.font='bold 15px system-ui';g.fillText('⭐ '+state.coins,15,25);g.fillStyle='#ffffff88';roundRect(g,15,38,W-30,7,4);g.fill();g.fillStyle='#fff';roundRect(g,15,38,(W-30)*Math.min(1,state.x/stages[state.world][state.level].length),7,4);g.fill();
+ drawHero(g,state.x-state.cam+22,state.y+23);
+ // Premium compact HUD
+ g.save();g.fillStyle='#302b50a8';roundRect(g,12,12,112,34,17);g.fill();g.font='bold 15px system-ui';g.textAlign='left';g.fillStyle='#fff';g.fillText('★ '+state.coins,25,34);
+ g.fillStyle='#ffffffb8';roundRect(g,137,20,W-154,12,7);g.fill();g.fillStyle='#fff';roundRect(g,137,20,Math.max(12,(W-154)*progress),12,7);g.fill();g.strokeStyle='#ffffffcc';g.lineWidth=1.5;roundRect(g,137,20,W-154,12,7);g.stroke();g.restore();
 }
+function drawWorldBackdrop(g,floor){const world=state.world,shift=state.cam;g.save();
+ if(world===0){ // Candy kingdom: gumdrop hills, candy-cane towers and frosting
+  for(let i=0;i<5;i++){const x=((i*210-shift*.12)%(W+260)+W+260)%(W+260)-120;g.fillStyle=['#ffb6d0','#f7c7ef','#ffe1a6'][i%3];g.beginPath();g.ellipse(x,floor-23,95,47,0,Math.PI,0);g.fill();g.fillStyle='#fff';g.beginPath();g.ellipse(x,floor-45,42,14,0,0,Math.PI*2);g.fill()}
+  for(let i=0;i<4;i++){const x=((i*275+100-shift*.42)%(W+180)+W+180)%(W+180)-80;g.fillStyle='#fff1f5';roundRect(g,x,floor-105,23,105,9);g.fill();g.fillStyle='#f48eb6';for(let y=floor-92;y<floor-8;y+=22){g.save();g.translate(x+11,y);g.rotate(.45);g.fillRect(-3,-12,6,24);g.restore()}g.fillStyle='#ffe3a1';g.beginPath();g.arc(x+11,floor-108,13,0,7);g.fill()}
+ }else if(world===1){ // Dinosaur island: volcanoes and friendly tropical leaves
+  for(let i=0;i<4;i++){const x=((i*270-shift*.13)%(W+300)+W+300)%(W+300)-100;g.fillStyle=i%2?'#78c99b':'#62b98d';g.beginPath();g.moveTo(x-125,floor);g.lineTo(x-35,floor-130);g.lineTo(x+8,floor-92);g.lineTo(x+105,floor);g.closePath();g.fill();g.fillStyle='#ffcf78';g.beginPath();g.moveTo(x-45,floor-116);g.lineTo(x-35,floor-130);g.lineTo(x-25,floor-116);g.fill()}
+  for(let i=0;i<6;i++){const x=((i*160+40-shift*.48)%(W+180)+W+180)%(W+180)-80;g.strokeStyle='#398d68';g.lineWidth=7;g.beginPath();g.moveTo(x,floor);g.quadraticCurveTo(x-15,floor-50,x-42,floor-55);g.stroke();g.beginPath();g.ellipse(x-43,floor-58,22,9,-.5,0,7);g.fillStyle='#77d39c';g.fill();g.beginPath();g.ellipse(x+15,floor-42,21,8,.4,0,7);g.fill()}
+ }else if(world===2){ // Ocean: layered waves, bubbles and coral silhouettes
+  for(let layer=0;layer<3;layer++){g.fillStyle=['#ffffff25','#2b9fc155','#176f9d55'][layer];g.beginPath();g.moveTo(0,floor-35+layer*30);for(let x=0;x<=W;x+=18)g.lineTo(x,floor-35+layer*30+Math.sin((x+shift*(.12+layer*.07))*.018+layer)*12);g.lineTo(W,floor);g.lineTo(0,floor);g.closePath();g.fill()}
+  for(let i=0;i<13;i++){const x=((i*83-shift*.3)%(W+90)+W+90)%(W+90)-30,y=75+(i*53%190)+Math.sin(state.time*1.5+i)*7;g.strokeStyle='#ffffff88';g.lineWidth=2;g.beginPath();g.arc(x,y,4+(i%3)*3,0,7);g.stroke()}
+  for(let i=0;i<5;i++){const x=((i*190+45-shift*.52)%(W+160)+W+160)%(W+160)-60;g.strokeStyle=i%2?'#ff9c9d':'#ffcf82';g.lineWidth=7;g.lineCap='round';g.beginPath();g.moveTo(x,floor);g.lineTo(x,floor-34);g.lineTo(x-15,floor-53);g.moveTo(x,floor-30);g.lineTo(x+17,floor-50);g.stroke()}
+ }else{ // Space: stars, distant planets and Saturn rings
+  g.fillStyle='#ffffff';for(let i=0;i<42;i++){const x=((i*97-shift*.08)%(W+30)+W+30)%(W+30)-10,y=(i*67)%Math.max(100,floor-35);const r=i%7===0?2.5:1.2;g.globalAlpha=.45+.4*Math.sin(state.time*2+i);g.beginPath();g.arc(x,y,r,0,7);g.fill()}g.globalAlpha=1;
+  for(let i=0;i<3;i++){const x=((i*320+100-shift*.17)%(W+250)+W+250)%(W+250)-100,y=105+(i%2)*80,r=28+i*8;g.fillStyle=['#e5a8d1','#9f9ae9','#f2c879'][i];g.beginPath();g.arc(x,y,r,0,7);g.fill();g.strokeStyle='#ffffff99';g.lineWidth=5;g.beginPath();g.ellipse(x,y,r+13,r*.32,-.25,0,7);g.stroke();g.fillStyle='#ffffff55';g.beginPath();g.arc(x-r*.3,y-r*.3,r*.22,0,7);g.fill()}
+ }
+ g.restore()}
+function drawFriendlyObstacle(g,x,floor,h,world){g.save();g.translate(x,floor);const color=['#df83aa','#4d9d70','#428eae','#7770bd'][world];g.shadowColor='#302b5030';g.shadowBlur=8;g.fillStyle=color;roundRect(g,0,-h.h,h.w,h.h,Math.min(13,h.w/3));g.fill();g.shadowBlur=0;g.strokeStyle='#ffffffaa';g.lineWidth=2;roundRect(g,0,-h.h,h.w,h.h,Math.min(13,h.w/3));g.stroke();g.fillStyle='#ffffff55';g.beginPath();g.ellipse(h.w*.32,-h.h*.72,5,3,-.4,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(h.w*.35,-h.h*.45,3,0,7);g.arc(h.w*.7,-h.h*.45,3,0,7);g.fill();g.fillStyle='#45334f';g.beginPath();g.arc(h.w*.35,-h.h*.45,1.5,0,7);g.arc(h.w*.7,-h.h*.45,1.5,0,7);g.fill();g.restore()}
+function drawHero(g,x,y){const c=chars[state.character],bob=state.y>=H-125?Math.sin(state.time*12)*1.8:0;g.save();g.translate(x,y+bob);g.rotate(Math.min(.18,Math.max(-.18,state.vy/3000)));g.lineJoin='round';g.strokeStyle='#fff';g.lineWidth=3.5;g.fillStyle=c.color;
+ if(state.character==='dino'){g.beginPath();g.ellipse(-1,5,22,17,0,0,7);g.fill();g.stroke();g.beginPath();g.moveTo(-18,10);g.lineTo(-31,17);g.lineTo(-17,20);g.closePath();g.fill();g.stroke();g.beginPath();g.arc(12,-10,14,0,7);g.fill();g.stroke();g.fillStyle='#4e956f';for(let k=0;k<3;k++){g.beginPath();g.moveTo(-11+k*11,-9);g.lineTo(-6+k*11,-21);g.lineTo(1+k*11,-9);g.fill()}g.fillStyle='#423552';g.beginPath();g.arc(16,-13,2.8,0,7);g.fill();g.fillStyle='#fff';g.beginPath();g.arc(18,-14,1,0,7);g.fill();g.strokeStyle='#356c55';g.lineWidth=2;g.beginPath();g.arc(17,-3,5,.2,2.7);g.stroke()}
+ else if(state.character==='estrelinha'){g.beginPath();for(let k=0;k<10;k++){const a=-Math.PI/2+k*Math.PI/5,r=k%2?12:26;g.lineTo(Math.cos(a)*r,Math.sin(a)*r)}g.closePath();g.fill();g.stroke();g.fillStyle='#49395d';g.beginPath();g.arc(-8,-2,2.8,0,7);g.arc(8,-2,2.8,0,7);g.fill();g.strokeStyle='#9a5361';g.lineWidth=2;g.beginPath();g.arc(0,4,7,.15,Math.PI-.15);g.stroke()}
+ else if(state.character==='foguetinho'){g.fillStyle='#ff956d';g.beginPath();g.moveTo(-12,13);g.lineTo(-20,26);g.lineTo(-5,22);g.closePath();g.fill();g.stroke();g.beginPath();g.moveTo(12,13);g.lineTo(20,26);g.lineTo(5,22);g.closePath();g.fill();g.stroke();g.fillStyle='#f4f2ff';g.beginPath();g.moveTo(0,-30);g.quadraticCurveTo(24,-8,17,17);g.quadraticCurveTo(0,31,-17,17);g.quadraticCurveTo(-24,-8,0,-30);g.fill();g.stroke();g.fillStyle='#9e9af2';g.beginPath();g.arc(0,-2,9,0,7);g.fill();g.stroke();g.fillStyle='#423552';g.beginPath();g.arc(-3,-3,2,0,7);g.arc(4,-3,2,0,7);g.fill();g.fillStyle='#ffb45f';g.beginPath();g.moveTo(-8,22);g.lineTo(0,36+Math.sin(state.time*22)*4);g.lineTo(8,22);g.closePath();g.fill()}
+ else{g.shadowColor='#b65b7040';g.shadowBlur=9;roundRect(g,-22,-22,44,44,14);g.fill();g.shadowBlur=0;g.stroke();g.fillStyle='#423552';g.beginPath();g.arc(-8,-3,3,0,7);g.arc(9,-3,3,0,7);g.fill();g.strokeStyle='#8d4656';g.lineWidth=2.5;g.beginPath();g.arc(0,4,7,.15,Math.PI-.15);g.stroke();g.fillStyle='#ffffff66';g.beginPath();g.ellipse(-9,-14,6,3,-.5,0,7);g.fill()}
+ g.restore()}
 function winLevel(){if(state.won)return;state.won=true;state.running=false;cancelAnimationFrame(raf);stopMusic();const id=state.world*3+state.level;state.done[id]=true;state.stars+=Math.max(1,state.coins);state.unlocked=Math.max(state.unlocked,Math.min(11,id+1));saveProgress();const final=id===11;$('win-title').textContent=final?'VOCÊ CONQUISTOU A AVENTURA!':'Você conseguiu!';$('win-copy').textContent=final?'As 12 fases concluídas! Você é incrível!':'Você encontrou '+Math.max(1,state.coins)+' estrelinhas. Que aventura!';const surprise=state.face&&state.faceEnabled&&(final||Math.random()<.22);$('rafael-surprise').classList.toggle('hidden',!surprise);if(surprise)$('rafael-image').src=state.face;$('next').textContent=final?'Jogar novamente ↻':state.level===2?'Próximo mundo ➜':'Próxima fase ➜';$('next').classList.toggle('hidden',false);$('replay').classList.remove('hidden');if(final)$('next').textContent='Recomeçar aventura ↻';$('win-panel').classList.remove('hidden');celebrate()}
 function celebrate(){for(let i=0;i<55;i++)state.particles.push({x:Math.random()*W,y:Math.random()*H*.7,vx:(Math.random()-.5)*150,vy:-Math.random()*180,life:1.5+Math.random(),color:['#ffe17c','#ff9fb6','#a8e6cf','#b6a5ff'][i%4]})}
 function nextLevel(){if(state.world===3&&state.level===2){state.world=0;state.level=0;setScreen('worlds');return}if(state.level<2)startLevel(state.level+1);else{state.world=Math.min(3,state.world+1);state.level=0;setScreen('levels')}}
