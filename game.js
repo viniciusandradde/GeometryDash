@@ -9,13 +9,18 @@ const ctx = canvas.getContext("2d");
 
 // -------------------- Screen --------------------
 let W, H, groundY;
+let pendingGroundDelta = 0;
 const GROUND_RATIO = 0.78;
 const CEIL_Y = 40;
 
 function resize() {
+  const previousGroundY = groundY;
   W = canvas.width = window.innerWidth;
   H = canvas.height = window.innerHeight;
   groundY = Math.floor(H * GROUND_RATIO);
+  if (Number.isFinite(previousGroundY)) {
+    pendingGroundDelta += groundY - previousGroundY;
+  }
 }
 resize();
 window.addEventListener("resize", resize);
@@ -47,6 +52,8 @@ function now() {
 
 // -------------------- State --------------------
 let gameState = "menu"; // menu | playing | paused | dead | complete
+let deathTimeout = null;
+let runGeneration = 0;
 let menuScreen = "main"; // main | levels
 let menuSel = 0;
 let practiceMode = false;
@@ -166,8 +173,14 @@ window.addEventListener("keydown", (e) => {
     }
   }
   if (c === "KeyP") {
-    if (gameState === "playing") gameState = "paused";
-    else if (gameState === "paused") gameState = "playing";
+    if (gameState === "playing") {
+      gameState = "paused";
+      inputHeld = false;
+      stopMusic();
+    } else if (gameState === "paused") {
+      gameState = "playing";
+      startMusic();
+    }
   }
   if (c === "KeyM") muted = !muted;
 
@@ -186,6 +199,20 @@ window.addEventListener("keydown", (e) => {
 
 window.addEventListener("keyup", (e) => {
   if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") iUp(e);
+});
+
+window.addEventListener("blur", () => {
+  inputHeld = false;
+});
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) {
+    inputHeld = false;
+    if (gameState === "playing") {
+      gameState = "paused";
+      stopMusic();
+    }
+  }
 });
 
 function tapHandler(x, y) {
@@ -208,6 +235,7 @@ function tapHandler(x, y) {
       return;
     }
     gameState = "playing";
+    startMusic();
     return;
   }
   // Check mute button (top-right)
@@ -253,6 +281,8 @@ function toggleFullscreen() {
 document.addEventListener("fullscreenchange", () => resize());
 
 function goToMenu() {
+  cancelDeathTransition();
+  inputHeld = false;
   gameState = "menu";
   menuScreen = "main";
   menuSel = 0;
@@ -810,10 +840,29 @@ function buildLevel3() {
 }
 
 let levels = makeLevels();
+let resizeTimer = null;
 window.addEventListener("resize", () => {
-  setTimeout(() => {
+  if (resizeTimer !== null) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    // Rebuild geometry against the new ground line, keeping the active run.
+    const previous = levelData;
     levels = makeLevels();
-  }, 60);
+    if (previous) {
+      const rebuilt = levels[currentLevelIdx];
+      for (const obstacle of rebuilt.obs) {
+        const oldObstacle = previous.obs.find(
+          (candidate) => candidate.type === obstacle.type && candidate.x === obstacle.x
+        );
+        if (oldObstacle && oldObstacle._hit) obstacle._hit = true;
+      }
+      levelData = rebuilt;
+    }
+    if (pendingGroundDelta !== 0) {
+      P.y += pendingGroundDelta;
+      pendingGroundDelta = 0;
+    }
+    resizeTimer = null;
+  }, 80);
 });
 
 // -------------------- Collision --------------------
@@ -888,7 +937,16 @@ function getProgress() {
 }
 
 // -------------------- Start / Restart --------------------
+function cancelDeathTransition() {
+  runGeneration++;
+  if (deathTimeout !== null) {
+    clearTimeout(deathTimeout);
+    deathTimeout = null;
+  }
+}
+
 function startLevel(idx) {
+  cancelDeathTransition();
   initAudio();
   currentLevelIdx = idx;
   levels = makeLevels();
@@ -905,6 +963,7 @@ function startLevel(idx) {
 }
 
 function restart() {
+  cancelDeathTransition();
   if (practiceMode && checkpoints.length) {
     resetPlayer(true);
   } else {
@@ -934,8 +993,12 @@ function kill() {
     bestProg[currentLevelIdx] = prog;
     save();
   }
-  setTimeout(() => {
-    if (gameState === "playing" || P.dead) gameState = "dead";
+  const generation = runGeneration;
+  deathTimeout = setTimeout(() => {
+    if (generation === runGeneration && gameState === "playing" && P.dead) {
+      gameState = "dead";
+    }
+    deathTimeout = null;
   }, 450);
 }
 
