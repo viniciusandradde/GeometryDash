@@ -16,6 +16,15 @@ assert.match(app,/indexedDB\.open/,'Photo personalization must use local Indexed
 assert.doesNotMatch(app,/\bfetch\s*\(/,'Game must not upload personal photos or call remote APIs');
 assert.match(app,/state\.faceEnabled/,'Family surprise must be optional');
 assert.equal(manifest.name,'Little Dash Adventure');
-assert.match(sw,/little-dash-v3/,'Service worker cache must be versioned');
+assert.match(sw,/little-dash-v4/,'Service worker cache must be versioned');
 assert.match(css,/prefers-reduced-motion/,'Reduced-motion preference must be respected');
-console.log('Smoke checks passed: DOM bindings, 4 worlds/12 levels configuration, victory, local photo storage, privacy, PWA cache and reduced motion.');
+assert.match(app,/function drawWorldBackdrop/,'Premium illustrated worlds must be rendered');
+assert.match(app,/function drawFriendlyObstacle/,'Friendly world obstacles must be rendered');
+assert.match(app,/function victoryFanfare/,'Original victory sound must exist');
+assert.match(app,/132/,'Music must use the documented original rhythm tempo');
+assert.match(app,/pace-select/,'Parent must be able to select the game pace');
+assert.match(app,/reduced-motion-enabled/,'Parent must be able to reduce motion');
+assert.match(app,/state.settings.pace==='adventure'\?245:205/,'Gentle pace must be the default');
+assert.match(html,/id="pace-select"/,'Pace control must exist in the UI');
+assert.match(html,/id="reduced-motion-enabled"/,'Reduced motion control must exist in the UI');
+console.log('Premium smoke checks passed: DOM, 4 worlds/12 levels, gameplay, local privacy, illustrated scenes, audio, accessibility, gentle pace and PWA cache.');
