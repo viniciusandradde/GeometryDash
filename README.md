@@ -1,109 +1,40 @@
-# Geometry Dash — VSA Tecnologia
+# Little Dash Adventure 🌈
+Uma aventura colorida, acolhedora e positiva para crianças.
 
-Jogo de plataforma rítmico em HTML5 Canvas e JavaScript puro, executado diretamente no navegador. Este projeto é independente e não é afiliado à RobTop Games.
+## Links
+- Jogar: https://viniciusandradde.github.io/GeometryDash/
+- Código: https://github.com/viniciusandradde/GeometryDash
+- Versões: https://github.com/viniciusandradde/GeometryDash/releases
+- Publicação e CI: https://github.com/viniciusandradde/GeometryDash/actions
 
-## Estado do projeto
-**Base jogável existente; etapa atual: estabilidade de gameplay e engenharia.** O jogo possui três fases, modos Cube/Ship, obstáculos, pads, orbs, portais de velocidade, Practice Mode, checkpoints, efeitos, áudio sintetizado e progresso local.
+A URL pública muda somente depois que a branch main receber a implementação e o workflow de Pages concluir com sucesso.
 
-Esta entrega corrige transições de morte, reconstrução de geometria ao redimensionar a janela e pausa ao alternar de aba. Ainda são necessários testes reais em navegadores e dispositivos.
+## Mundos
+1. Reino dos Doces — Bosque de Balas, Ponte de Biscoito, Castelo de Chocolate.
+2. Ilha dos Dinossauros — Vale das Pegadas, Vulcão Dorminhoco, Festa dos Dinossauros.
+3. Fundo do Mar — Jardim de Corais, Caverna das Pérolas, Baile das Sereias.
+4. Aventura Espacial — Lua de Queijo, Anéis de Saturno, Grande Cometa.
 
-## Executar
-Não há etapa de build nem dependências externas para executar a versão web. Na raiz do repositório:
-
-```bash
-python3 -m http.server 8000
-```
-
-Acesse http://localhost:8000.
-
-## Aplicativo Android: arquitetura e tecnologia
-
-O projeto também possui empacotamento para Android por meio do **Capacitor 7**.
-
-**Importante: o jogo não foi desenvolvido integralmente em Kotlin.** A lógica principal, a física, as fases, a renderização e o áudio continuam implementados em JavaScript, HTML5 Canvas e CSS. No Android, essa aplicação web é executada dentro de uma WebView, empacotada como aplicativo Android pelo Capacitor.
-
-| Camada | Tecnologia | Responsabilidade |
-|---|---|---|
-| Jogo e gameplay | JavaScript | Física, controles, colisões, fases, progresso e áudio |
-| Interface e renderização | HTML5 Canvas e CSS | Tela do jogo, menus e apresentação visual |
-| Integração Android | Capacitor 7 | Empacotamento da aplicação web e acesso às capacidades nativas quando necessário |
-| Projeto nativo Android | Android / Gradle | Estrutura de compilação e geração do APK |
-
-Configuração atual:
-- **Application ID:** `com.vsa.technology.geometrydash`
-- **Nome Android:** `Geometry Dash VSA`
-- **Diretório web empacotado:** `www/`
-- **APK gerado no CI:** variante debug (`app-debug.apk`).
-
-O projeto Android é preparado durante o workflow de CI; portanto, a implementação atual não representa uma reescrita nativa do motor do jogo em Kotlin. Caso sejam adicionadas funcionalidades nativas específicas, elas poderão utilizar Kotlin no projeto Android.
-
-### Gerar o APK localmente
-
-Requisitos: Node.js 20 ou compatível, JDK 21, Android SDK e ferramentas do Gradle.
-
-```bash
-npm install
-mkdir -p www
-cp index.html game.js styles.css www/
-npx cap add android
-npx cap sync android
-cd android
-./gradlew assembleDebug
-```
-
-O APK de debug será gerado em:
-
-```
-android/app/build/outputs/apk/debug/app-debug.apk
-```
-
-Para atualizar os arquivos web depois de alterações no jogo:
-
-```bash
-mkdir -p www
-cp index.html game.js styles.css www/
-npx cap sync android
-```
+## Executar localmente
+Execute python3 -m http.server 8000 e abra http://localhost:8000. Em navegador compatível, use Instalar aplicativo ou Adicionar à tela inicial.
 
 ## Controles
-| Ação | Teclado | Mouse / toque |
-|---|---|---|
-| Pular / voar | Espaço, ↑ ou W | Clique / toque |
-| Pausar / retomar | P | Toque durante pausa |
-| Reiniciar após colisão | Espaço / Enter | Toque |
-| Silenciar | M | Botão de áudio |
-| Menu | Esc | Botão de retorno |
-| Tela cheia | F | — |
+Toque/clique ou Espaço/Seta para cima para saltar. Botão de pausa interrompe a partida. Sem Game Over ou perda de progresso.
 
-## Recursos atuais
-- Três fases: Neon Pulse, Rebound e Spectral Drift.
-- Modos Cube e Ship.
-- Espinhos, blocos, plataformas, gaps, movers, pads, orbs e portais.
-- Velocidades slow, normal, fast e very fast.
-- Practice Mode e checkpoints.
-- Progresso e tentativas salvos em localStorage.
-- Efeitos visuais e áudio sintetizado via Web Audio API.
+## Foto opcional do Rafael
+A área dos responsáveis permite importar uma foto do dispositivo para uma comemoração surpresa. A imagem é redimensionada e armazenada no IndexedDB local. Não faz parte do repositório, não é enviada a servidores e pode ser removida/desativada. Não há reconhecimento facial.
 
-## Estrutura
-- `index.html`: entrada.
-- `game.js`: lógica, física, fases, renderização e áudio.
-- `styles.css`: layout.
-- `actions.json`: sequência de ações para teste/playback.
-- `docs/`: arquitetura, QA e roadmap.
-- `package.json` e `capacitor.config.json`: dependências e configuração do empacotamento Android.
-- `.github/workflows/`: automação de validação, publicação web e geração do APK.
+## Arquitetura
+- index.html: interface e estrutura.
+- styles.css: identidade visual e layout responsivo.
+- app.js: navegação, Canvas, fases, progresso e personalização.
+- manifest.json: metadados PWA.
+- sw.js: cache offline.
+- docs/PRD-LITTLE-DASH-ADVENTURE.md: requisitos e referências.
+- docs/ADRs.md: decisões arquiteturais.
 
-## Qualidade
-```bash
-node --check game.js
-```
+## Estado atual
+Esta é uma primeira base funcional com menus, 12 fases configuradas, gameplay Canvas simples, estrelas, recuperação assistida, salvamento local, PWA e personalização opcional. Arte final, trilhas originais completas, inventário cosmético, dificuldade adaptativa refinada, ícones PWA e testes em aparelhos reais ainda são etapas de produção.
 
-- [Arquitetura](docs/ARCHITECTURE.md)
-- [QA](docs/QA.md)
-- [Roadmap](docs/ROADMAP.md)
-
-## Persistência e privacidade
-O progresso é armazenado localmente no navegador pela chave `gd_save2`. Não há conta, backend ou telemetria implementados nesta base. Limpar os dados do navegador pode apagar o progresso.
-
-## Licença e propriedade intelectual
-O arquivo LICENSE existente declara MIT e atribui copyright a Anay Goenka. Preserve esse aviso e os termos da licença ao redistribuir. Geometry Dash e suas marcas/ativos oficiais pertencem aos respectivos titulares. Use somente identidade visual, músicas, sprites e fases originais ou devidamente licenciados; não utilize assets extraídos do jogo comercial.
+## Versionamento
+SemVer MAJOR.MINOR.PATCH. Cada release deve validar navegação, gameplay, vitória, persistência, offline e exclusão da foto. Nunca publicar imagens pessoais ou assets sem licença comprovada.
